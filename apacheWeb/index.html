@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Focus Mode Management Page</title>
+    <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <h1>Focus Mode Management Page</h1>
+  <div class="container">
+
+    <!-- 1. Auto Focus Mode On/Off -->
+    <section class="card" id="auto-focus-section">
+      <h2>1. Auto Focus Mode</h2>
+      <label class="switch">
+        <input type="checkbox" id="autoFocusToggle">
+        <span class="slider"></span>
+      </label>
+      <span id="autoFocusStatus" style="margin-left: 12px; font-weight: 600; color:#27ae60;">OFF</span>
+    </section>
+
+    <!-- 2. Focus Mode Time List -->
+    <section class="card" id="focus-time-section">
+      <h2>2. Focus Mode Time List</h2>
+      <table id="focusTimeTable">
+        <thead>
+          <tr>
+            <th>Time (Start - End)</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic list items -->
+        </tbody>
+      </table>
+      <form id="focusTimeForm" class="inline-form" onsubmit="return false;">
+        <input type="time" id="startTime" required /> ~
+        <input type="time" id="endTime" required />
+        <button type="submit">Add</button>
+      </form>
+    </section>
+
+    <!-- 3. Website/App Block List -->
+    <section class="card" id="block-list-section">
+      <h2>3. Website / App Block List</h2>
+      <table id="blockListTable">
+        <thead>
+          <tr>
+            <th>Block Target (URL or App Name)</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic list items -->
+        </tbody>
+      </table>
+      <form id="blockListForm" class="inline-form" onsubmit="return false;">
+        <input type="text" id="blockTarget" placeholder="e.g., www.example.com" required />
+        <button type="submit">Add</button>
+      </form>
+    </section>
+
+    <!-- 4. Temporary Focus Mode Unblock -->
+    <section class="card" id="temp-unblock-section">
+      <h2>4. Temporary Focus Mode Unblock</h2>
+      <button class="temp-disable-btn" id="tempUnblockBtn">Temporarily Unblock</button>
+    </section>
+
+    <!-- 5. Calendar Events -->
+    <section class="card" id="calendar-section">
+      <h2>5. Calendar Events</h2>
+      <table id="calendarTable">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Content</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic list items -->
+        </tbody>
+      </table>
+      <form id="calendarForm" class="inline-form" onsubmit="return false;">
+        <input type="datetime-local" id="eventDateTime" required />
+        <input type="text" id="eventContent" placeholder="Event content" required />
+        <button type="submit">Add</button>
+      </form>
+    </section>
+
+  </div>
+
+<script>
+  // 1. Auto Focus Mode Toggle
+  const autoFocusToggle = document.getElementById('autoFocusToggle');
+  const autoFocusStatus = document.getElementById('autoFocusStatus');
+
+  autoFocusToggle.addEventListener('change', () => {
+    const state = autoFocusToggle.checked;
+    autoFocusStatus.textContent = state ? 'ON' : 'OFF';
+    autoFocusStatus.style.color = state ? '#27ae60' : '#e74c3c';
+    console.log('[AutoFocus] State changed:', state ? 'ON' : 'OFF');
+  });
+
+  // 2. Focus Mode Time List Management
+  const focusTimeTableBody = document.querySelector('#focusTimeTable tbody');
+  const focusTimeForm = document.getElementById('focusTimeForm');
+  const startTimeInput = document.getElementById('startTime');
+  const endTimeInput = document.getElementById('endTime');
+
+  let focusTimes = [];
+
+  function renderFocusTimes() {
+    focusTimeTableBody.innerHTML = '';
+    focusTimes.forEach((time, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${time.start} - ${time.end}</td>
+        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+      `;
+      focusTimeTableBody.appendChild(tr);
+    });
+  }
+
+  focusTimeForm.addEventListener('submit', () => {
+    const start = startTimeInput.value;
+    const end = endTimeInput.value;
+    if (start >= end) {
+      alert('Start time must be earlier than end time.');
+      return;
+    }
+    focusTimes.push({ start, end });
+    renderFocusTimes();
+    startTimeInput.value = '';
+    endTimeInput.value = '';
+  });
+
+  focusTimeTableBody.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-btn')) {
+      const idx = e.target.dataset.index;
+      focusTimes.splice(idx, 1);
+      renderFocusTimes();
+    }
+  });
+
+  // 3. Website/App Block List Management
+  const blockListTableBody = document.querySelector('#blockListTable tbody');
+  const blockListForm = document.getElementById('blockListForm');
+  const blockTargetInput = document.getElementById('blockTarget');
+
+  let blockList = [];
+
+  function renderBlockList() {
+    blockListTableBody.innerHTML = '';
+    blockList.forEach((item, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item}</td>
+        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+      `;
+      blockListTableBody.appendChild(tr);
+    });
+  }
+
+  blockListForm.addEventListener('submit', () => {
+    const target = blockTargetInput.value.trim();
+    if (!target) {
+      alert('Please enter a block target.');
+      return;
+    }
+    if (blockList.includes(target)) {
+      alert('This target is already in the block list.');
+      return;
+    }
+    blockList.push(target);
+    renderBlockList();
+    blockTargetInput.value = '';
+  });
+
+  blockListTableBody.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-btn')) {
+      const idx = e.target.dataset.index;
+      blockList.splice(idx, 1);
+      renderBlockList();
+    }
+  });
+
+  // 4. Temporary Focus Mode Unblock Button
+  const tempUnblockBtn = document.getElementById('tempUnblockBtn');
+  tempUnblockBtn.addEventListener('click', () => {
+    alert('Focus mode temporarily disabled for 5 minutes.');
+    console.log('[FocusMode] Temporarily disabled for 5 minutes');
+    // Here you can implement actual disable logic and timer if needed.
+  });
+
+  // 5. Calendar Events Management
+  const calendarTableBody = document.querySelector('#calendarTable tbody');
+  const calendarForm = document.getElementById('calendarForm');
+  const eventDateTimeInput = document.getElementById('eventDateTime');
+  const eventContentInput = document.getElementById('eventContent');
+
+  let calendarEvents = [];
+
+  function renderCalendarEvents() {
+    calendarTableBody.innerHTML = '';
+    calendarEvents.forEach((event, idx) => {
+      const tr = document.createElement('tr');
+      const dtFormatted = new Date(event.dateTime).toLocaleString();
+      tr.innerHTML = `
+        <td>${dtFormatted}</td>
+        <td>${event.content}</td>
+        <td><button class="delete-btn" data-index="${idx}">Delete</button></td>
+      `;
+      calendarTableBody.appendChild(tr);
+    });
+  }
+
+  calendarForm.addEventListener('submit', () => {
+    const dateTime = eventDateTimeInput.value;
+    const content = eventContentInput.value.trim();
+    if (!dateTime || !content) {
+      alert('Please fill in all fields.');
+      return;
+    }
+    calendarEvents.push({ dateTime, content });
+    renderCalendarEvents();
+    eventDateTimeInput.value = '';
+    eventContentInput.value = '';
+  });
+
+  calendarTableBody.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-btn')) {
+      const idx = e.target.dataset.index;
+      calendarEvents.splice(idx, 1);
+      renderCalendarEvents();
+    }
+  });
+
+</script>
+</body>
+</html>
