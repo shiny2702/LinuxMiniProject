@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 유휴 시간 기준 (ms)
+# 유휴 시간 기준 (ms) #10분 그대로 유지 ##끄고 켜는 걸로 하기
 IDLE_THRESHOLD=$((10 * 60 * 1000))  # 10분
 
 while true; do

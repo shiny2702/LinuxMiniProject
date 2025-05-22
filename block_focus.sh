@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 차단할 도메인 및 앱 리스트 
+# 차단할 도메인 및 앱 리스트 ## 입력값을 받아야됨 수정
 BLOCK_SITES=("facebook.com" "youtube.com" "instagram.com")
 BLOCK_APPS=("discord" "spotify")
 
