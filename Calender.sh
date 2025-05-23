@@ -1,105 +1,75 @@
-#로그 기록 포맷 예시 (~/focus_mode.log)
-2025-05-19 START 10:00:00
-2025-05-19 END 11:45:00
-2025-05-19 START 15:00:00
-2025-05-19 END 16:00:00
+#로그 저장 구조
+#~/.focus_logs/YYYY-MM-DD.log
 
-#집중 모드 실행 스크립트(로그 기록 포함)
-
+#~/.focus_mode_on.sh (시작 시 호출)
 #!/bin/bash
+FOCUS_LOG_DIR="$HOME/.focus_logs"
+mkdir -p "$FOCUS_LOG_DIR"
 
-export DISPLAY=:0
-export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+DATE=$(date +%F)
+TIME=$(date +%T)
 
-LOGFILE="$HOME/focus_mode.log"
-
-# 로그 시작 시간
-echo "$(date '+%F') START $(date '+%T')" >> "$LOGFILE"
-
-# 알림
-notify-send "집중 모드가 실행됩니다"
-
-#사용자가 직접 종료할 때 종료 기록 남김(focus_end.sh)
-#!/bin/bash
-
-LOGFILE="$HOME/focus_mode.log"
-echo "$(date '+%F') END $(date '+%T')" >> "$LOGFILE"
-
-notify-send "집중 모드가 종료되었습니다"
-
-#하루별 집중 시간 계산 스크립트(daily_focus_report.sh)
-
-#!/bin/bash
-
-LOGFILE="$HOME/focus_mode.log"
-DATE=$(date '+%F')
-
-# 오늘 날짜 로그 추출
-awk -v date="$DATE" '$1 == date' "$LOGFILE" > /tmp/focus_today.log
-
-# 시간 누적
-total_sec=0
-while read -r line1 && read -r line2; do
-    start=$(echo "$line1" | awk '{print $3}')
-    end=$(echo "$line2" | awk '{print $3}')
-    sec=$(( $(date -d "$end" +%s) - $(date -d "$start" +%s) ))
-    total_sec=$((total_sec + sec))
-done < /tmp/focus_today.log
-
-hours=$((total_sec / 3600))
-minutes=$(((total_sec % 3600) / 60))
-
-notify-send "오늘 집중 모드 사용 시간: ${hours}시간 ${minutes}분"
-
-chmod +x ~/daily_focus_report.sh
-
-#주간 평균 통계 스크립트(weekly_focus_report.sh)
-
-#!/bin/bash
-
-LOGFILE="$HOME/focus_mode.log"
-START_DATE=$(date -d "last monday" '+%F')
-END_DATE=$(date -d "last sunday" '+%F')
-
-total_sec=0
-days=0
-
-# 월요일부터 일요일까지
-for d in $(seq 0 6); do
-    day=$(date -d "$START_DATE +$d day" '+%F')
-    awk -v date="$day" '$1 == date' "$LOGFILE" > /tmp/day.log
-
-    daily_sec=0
-    while read -r line1 && read -r line2; do
-        start=$(echo "$line1" | awk '{print $3}')
-        end=$(echo "$line2" | awk '{print $3}')
-        sec=$(( $(date -d "$end" +%s) - $(date -d "$start" +%s) ))
-        daily_sec=$((daily_sec + sec))
-    done < /tmp/day.log
-
-    if [ "$daily_sec" -gt 0 ]; then
-        total_sec=$((total_sec + daily_sec))
-        days=$((days + 1))
-    fi
-done
-
-if [ "$days" -eq 0 ]; then
-    avg_sec=0
-else
-    avg_sec=$((total_sec / days))
+# 스위치 확인 (켜져있을 때만 기록 시작)
+FOCUS_SWITCH="$HOME/.focus_mode_enabled"
+if [ -f "$FOCUS_SWITCH" ]; then
+    echo "START: $TIME" >> "$FOCUS_LOG_DIR/$DATE.log"
+    echo "$TIME" > "$HOME/.focus_current_start"
 fi
 
-hours=$((avg_sec / 3600))
-minutes=$(((avg_sec % 3600) / 60))
+# 알림
+DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus notify-send "집중 모드 시작" "지금부터 집중 모드입니다."
 
-notify-send "이번 주 집중 모드 사용 시간 평균은 ${hours}시간 ${minutes}분입니다."
 
-chmod +x ~/weekly_focus_report.sh
+#~/.focus_mode_off.sh (종료 시 호출)
+#!/bin/bash
+FOCUS_LOG_DIR="$HOME/.focus_logs"
+mkdir -p "$FOCUS_LOG_DIR"
 
-#crontab 설정
-crontab -e
-# 매일 밤 23:59에 오늘의 집중 모드 사용 시간 알림
-59 23 * * * /home/USERNAME/daily_focus_report.sh
+DATE=$(date +%F)
+END_TIME=$(date +%T)
 
-# 매주 일요일 밤 23:59에 주간 평균 시간 알림
-59 23 * * 0 /home/USERNAME/weekly_focus_report.sh
+# 스위치가 켜져있고 시작 시간이 기록되어 있을 경우만 종료 기록
+if [ -f "$HOME/.focus_mode_enabled" ] && [ -f "$HOME/.focus_current_start" ]; then
+    START_TIME=$(cat "$HOME/.focus_current_start")
+    rm "$HOME/.focus_current_start"
+
+    # 시간 계산
+    START_TS=$(date -d "$START_TIME" +%s)
+    END_TS=$(date -d "$END_TIME" +%s)
+    DURATION=$((END_TS - START_TS))
+
+    echo "END: $END_TIME" >> "$FOCUS_LOG_DIR/$DATE.log"
+    echo "DURATION: $DURATION" >> "$FOCUS_LOG_DIR/$DATE.log"
+fi
+
+DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus notify-send "집중 모드 종료" "집중 모드가 종료되었습니다."
+
+#ON/OFF 스위치 이야기를 했더니 GPT가 써 줬는데... 필요없으시면 삭제해 주세요!
+#프론드엔드 버튼이랑 연결하면 된다고 합니다
+# 집중모드 수동 활성화
+touch ~/.focus_mode_enabled
+
+# 집중모드 수동 비활성화
+rm -f ~/.focus_mode_enabled
+
+#get_focus_duration.sh 날짜별 사용 시간 계산 스크립트
+#!/bin/bash
+DATE="$1"
+LOG="$HOME/.focus_logs/$DATE.log"
+
+if [ ! -f "$LOG" ]; then
+    echo "00:00:00"
+    exit 0
+fi
+
+TOTAL=0
+while read -r LINE; do
+    if [[ $LINE == DURATION:* ]]; then
+        SECONDS=$(echo $LINE | cut -d' ' -f2)
+        TOTAL=$((TOTAL + SECONDS))
+    fi
+done < "$LOG"
+
+# 출력: HH:MM:SS 형식
+printf '%02d:%02d:%02d\n' $((TOTAL/3600)) $((TOTAL%3600/60)) $((TOTAL%60))
+#사용 예: ./get_focus_duration.sh 2025-05-23
