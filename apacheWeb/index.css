@@ -1,145 +1,86 @@
-* {
-  box-sizing: border-box;
-}
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f7f9;
-  margin: 0; padding: 20px;
-  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #1e1e2f;
+  color: #ffffff;
+  margin: 0;
+  padding: 2rem;
 }
+
 h1 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #2c3e50;
+  margin-bottom: 2rem;
 }
 
-/* Container & card */
-.container {
-  max-width: 960px;
-  margin: 0 auto;
+.section-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
 }
-.card {
-  background: white;
+
+.section-nav button {
+  padding: 0.5rem 1rem;
+  background-color: #3d3d5c;
+  color: white;
+  border: none;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-  padding: 20px 25px;
-  margin-bottom: 25px;
+  cursor: pointer;
 }
+
+.section-nav button:hover {
+  background-color: #57577a;
+}
+
+.card {
+  background-color: #2d2d44;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
 .card h2 {
   margin-top: 0;
-  color: #34495e;
 }
 
-/* Toggle Switch */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 26px;
-  vertical-align: middle;
-}
-.switch input {
-  opacity: 0;
-  width: 0; height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #ccc;
-  border-radius: 26px;
-  transition: 0.4s;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 20px; width: 20px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.4s;
-}
-input:checked + .slider {
-  background-color: #27ae60;
-}
-input:checked + .slider:before {
-  transform: translateX(24px);
-}
-
-/* Tables */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-th, td {
-  padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
-}
-th {
-  background: #3498db;
-  color: white;
-}
-tbody tr:hover {
-  background-color: #f1f9ff;
-}
-
-/* Form inline */
-form.inline-form {
-  margin-top: 15px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-form.inline-form input[type="text"],
-form.inline-form input[type="datetime-local"] {
-  flex: 1;
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-form.inline-form button {
-  padding: 7px 15px;
-  background-color: #2980b9;
+.card input,
+.card select,
+.card button {
+  padding: 0.5rem;
+  margin: 0.25rem;
   border: none;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-form.inline-form button:hover {
-  background-color: #1f618d;
-}
-
-/* Delete button */
-button.delete-btn {
-  background-color: #e74c3c;
-  border: none;
-  color: white;
-  padding: 5px 9px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-button.delete-btn:hover {
-  background-color: #c0392b;
-}
-
-/* Temporary disable button */
-.temp-disable-btn {
-  background-color: #f39c12;
-  border: none;
-  color: white;
-  padding: 10px 16px;
   border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 10px;
-  display: inline-block;
-  transition: background-color 0.3s;
 }
-.temp-disable-btn:hover {
-  background-color: #d68910;
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.calendar-day {
+  background-color: #3d3d5c;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.calendar-header {
+  font-weight: bold;
+  text-align: center;
+  color: #cccccc;
+}
+
+.delete-btn {
+  margin-left: 1rem;
+  background-color: #aa3e3e;
+  color: white;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #d14c4c;
 }
