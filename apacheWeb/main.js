@@ -66,7 +66,7 @@ async function initApp() {
   };
 
   window.togglePopup = function (enabled) {
-    fetch('/toggle-popup', {
+    fetch('http://127.0.0.1:3000/toggle-popup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ enabled })
@@ -75,6 +75,7 @@ async function initApp() {
       .catch(err => console.error('에러:', err));
   };
 
+  
   // Calendar 관련 로직
   let currentYear = new Date().getFullYear();
   let currentMonth = new Date().getMonth();
