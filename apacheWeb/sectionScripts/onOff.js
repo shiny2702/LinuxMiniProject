@@ -91,17 +91,23 @@ function applyGuiBlockOverlay() {
   if (!document.getElementById('guiBlockOverlay')) {
     const overlay = document.createElement('div');
     overlay.id = 'guiBlockOverlay';
+
+    // header 높이 계산
+    const headerHeight = document.querySelector('header')?.offsetHeight || 0;
+
     overlay.style.position = 'fixed';
-    overlay.style.top = '0';
+    overlay.style.top = `${headerHeight}px`; // header 아래부터
     overlay.style.left = '0';
     overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
+    overlay.style.height = `calc(100vh - ${headerHeight}px)`; // header 제외
     overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
     overlay.style.zIndex = '9999';
     overlay.style.cursor = 'not-allowed';
+
     document.body.appendChild(overlay);
   }
 }
+
 
 // ✅ GUI 복구
 function removeGuiBlockOverlay() {
