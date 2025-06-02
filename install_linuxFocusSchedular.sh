@@ -6,12 +6,12 @@ set -e
 APP_DIR="/opt/LinuxFocusScheduler"
 LOG_DIR="/var/log/LinuxFocusScheduler"
 WEB_ROOT="/var/www/html"
-SRC_DIR="$PWD"  # 현재 디렉토리 기준 (개발 환경에서 실행)
+SRC_DIR="$PWD"  # 현재 디렉토리 기준 (opt,var에 디렉터리 구성 전 user homeDir))
 CAFFEINE_DIR="$HOME/.local/share/gnome-shell/extensions/caffeine@patapon.info"
 
 echo "1. 패키지 설치 중..."
 sudo apt update
-sudo apt install -y nodejs npm apache2 curl git python3 python3-pip libinput-tools
+sudo apt install -y nodejs npm apache2 curl git python3 python3-pip libinput-tools jq
 sudo pip3 install notify2 --break-system-packages
 
 echo "2. 애플리케이션 디렉토리 구성 중..."

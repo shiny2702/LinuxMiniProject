@@ -1,17 +1,11 @@
 // backend/routes/togglePopup.js
 const express = require('express');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const { execFile } = require('child_process');
 const router = express.Router();
 
-router.get('/toggle-popup', (req, res) => {
-  const statusFile = path.join(__dirname, '..', '..', 'state', 'idle_popup_enabled');
-  fs.readFile(statusFile, 'utf8', (err, data) => {
-    if (err) return res.json({ enabled: false });
-    res.json({ enabled: data.trim() === 'on' });
-  });
-});
+const STATE_FILE = '/opt/LinuxFocusScheduler/state/idle_popup_enabled';
 
 router.post('/toggle-popup', (req, res) => {
   const { enabled } = req.body;
@@ -26,6 +20,18 @@ router.post('/toggle-popup', (req, res) => {
     console.log(`상태 변경됨: ${state}`);
     res.send('상태 변경 성공');
   });
+});
+
+router.get('/status', (req, res) => {
+  try {
+    const state = fs.existsSync(STATE_FILE)
+      ? fs.readFileSync(STATE_FILE, 'utf-8').trim()
+      : 'off';
+    res.json({ enabled: state === 'on' });
+  } catch (err) {
+    console.error('상태 파일 읽기 오류:', err);
+    res.status(500).json({ error: '상태 파일 읽기 실패' });
+  }
 });
 
 module.exports = router;
