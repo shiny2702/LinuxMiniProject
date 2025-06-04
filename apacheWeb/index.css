@@ -80,7 +80,9 @@
     border-radius: 8px;
     border: 2px solid #f4a261;
     box-shadow: 0 0 6px orange;
+    color: black;
   }
+
 
   .delete-btn {
     margin-left: 1rem;

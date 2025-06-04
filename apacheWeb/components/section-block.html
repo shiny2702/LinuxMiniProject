@@ -1,6 +1,16 @@
-  <section id="block" class="card" style="display: none;">
-    <h2>2. Blocked Sites & Apps</h2>
-    <input type="text" id="blockInput" placeholder="example.com or app name" />
-    <button onclick="addBlockedItem()">Add</button>
-    <ul id="blockList"></ul>
-  </section>
+<!-- 'Blocked Sites & Apps' 섹션: 초기에는 숨겨져 있으며, 특정 버튼 클릭 시 표시됨 -->
+<section id="block" class="card" style="display: none;">
+  
+  <!-- 섹션 제목 -->
+  <h2>2. Blocked Sites & Apps</h2>
+  
+  <!-- 사용자 입력 필드: 차단할 사이트나 앱 이름 입력 -->
+  <input type="text" id="blockInput" placeholder="ex> www.example.com" />
+  
+  <!-- 입력값을 차단 목록에 추가하는 버튼 -->
+  <button onclick="addBlockedItem()">Add</button>
+  
+  <!-- 차단된 사이트 및 앱 목록을 표시할 영역 -->
+  <ul id="blockList"></ul>
+
+</section>

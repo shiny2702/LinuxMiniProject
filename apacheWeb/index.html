@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- 문서의 문자 인코딩을 UTF-8로 설정 -->
   <meta charset="UTF-8" />
+  
+  <!-- 반응형 웹을 위한 뷰포트 설정 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- 페이지 제목 -->
   <title>LinuxFocusScheduler</title>
+  
+  <!-- 외부 스타일시트 연결 -->
   <link rel="stylesheet" href="index.css" />
 </head>
 <body>
+  <!-- 페이지 상단 헤더 영역 -->
   <header>
+    <!-- 사이트 타이틀 -->
     <h1>LinuxFocusScheduler</h1>
+
+    <!-- 온오프 스위치 삽입 위치 (JavaScript에서 동적으로 생성됨) -->
     <div id="toggle-container"></div>
   </header>
 
+  <!-- 앱 주요 콘텐츠가 삽입될 컨테이너 -->
   <div id="app"></div>
 
+  <!-- 메인 JavaScript 모듈 불러오기 -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
+
