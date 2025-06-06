@@ -25,13 +25,14 @@ window.handleSchedulerOn = async function () {
     const res = await fetch('http://127.0.0.1:3000/utils/focusTimeChecker');
     const { isFocusTime } = await res.json();
 
+    // 크론 등록 스크립트 실행 (집중 시간 도메인 차단/해제 및 집중 시간 분석용 전체)
+    await window.execScript('register_analyzing_cron.sh');
+    await window.execScript('register_cron.sh');
+
     // 집중 시간이라면 도메인 차단 스크립트 실행
     if (isFocusTime) {
       await window.execScript('block_domains.sh');
     }
-
-    // 크론 등록 스크립트 실행 (집중 시간 분석용)
-    await window.execScript('register_analyzing_cron.sh');
 
     // Idle 모니터링 시작
     await window.toggleIdleMonitor(true);
@@ -50,13 +51,14 @@ window.handleSchedulerOff = async function () {
     const res = await fetch('http://127.0.0.1:3000/utils/focusTimeChecker');
     const { isFocusTime } = await res.json();
 
+    // 등록된 크론 전체 제거
+    await window.execScript('remove_analyzing_cron.sh');
+    await window.execScript('remove_cron.sh');
+
     // 집중 시간이라면 도메인 차단 해제 스크립트 실행
     if (isFocusTime) {
       await window.execScript('unblock_domains.sh');
     }
-
-    // 분석용 크론 제거
-    await window.execScript('remove_analyzing_cron.sh');
 
     // Idle 모니터링 중단
     await window.toggleIdleMonitor(false);
