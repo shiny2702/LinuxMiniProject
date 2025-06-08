@@ -1,0 +1,32 @@
+<!-- 'Focus Calendar' 섹션: 기본적으로 숨겨져 있으며, 특정 버튼 클릭 시 표시됨 -->
+<section id="calendar" style="display: none;">
+
+  <!-- 카드 스타일의 컨테이너 -->
+  <div class="card">
+    
+    <!-- 섹션 제목 -->
+    <h2>4. Focus Calendar</h2>
+
+    <!-- 연/월 네비게이션 영역 -->
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <!-- 이전 연도 이동 버튼 -->
+      <button onclick="prevYear()">«</button>
+
+      <!-- 이전 달 이동 버튼 -->
+      <button onclick="prevMonth()">‹</button>
+
+      <!-- 현재 달/연도를 표시할 영역 -->
+      <span id="calendarTitle" style="font-weight: bold;"></span>
+
+      <!-- 다음 달 이동 버튼 -->
+      <button onclick="nextMonth()">›</button>
+
+      <!-- 다음 연도 이동 버튼 -->
+      <button onclick="nextYear()">»</button>
+    </div>
+
+    <!-- 날짜들이 렌더링될 달력 그리드 영역 -->
+    <div class="calendar-grid" id="calendarDays"></div>
+  </div>
+
+</section>
