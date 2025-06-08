@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# 집중 시간에 등록된 도메인을 /etc/hosts 파일을 통해 차단하는 스크립트
+# 집중 시간에 등록된 도메인을 /etc/hosts 이나 /etc/dnsmasq.conf 파일을 통해 차단하는 스크립트
 
 # 차단 대상 도메인이 저장된 JSON 파일 경로
 JSON_FILE="/opt/LinuxFocusScheduler/state/registered_blockSiteApp.json"
-# hosts 파일 경로
+# hosts 파일 및 dnsmasq 설정파일 경로
 HOSTS_FILE="/etc/hosts"
+DNSMASQ_CONF="/etc/dnsmasq.conf"
 # 로그 디렉터리 및 로그 파일 경로 설정
 LOG_DIR="/var/log/LinuxFocusScheduler"
 FOCUSED_LOG="$LOG_DIR/focusedTime.log"
@@ -34,12 +35,18 @@ BACKUP_FILE="/etc/hosts.block.backup.$(date +%Y%m%d%H%M%S)"
 sudo cp "$HOSTS_FILE" "$BACKUP_FILE"
 echo "✔️ 기존 /etc/hosts 백업 완료: $BACKUP_FILE"
 
+# /etc/dnsmasq.conf 백업
+DNSMASQ_BACKUP="/etc/dnsmasq.conf.block.backup.$(date +%Y%m%d%H%M%S)"
+sudo cp "$DNSMASQ_CONF" "$DNSMASQ_BACKUP"
+echo "✔️ 기존 /etc/dnsmasq.conf 백업 완료: $DNSMASQ_BACKUP"
+
 # 차단 시작 로그 기록
 log_event "⏰ 집중 시간 시작 - 도메인 차단 스크립트 실행"
 
 # 도메인 차단 개수 및 추가할 줄 초기화
 BLOCKED=0
 append_lines=""
+append_dnsmasq=""
 
 # JSON에서 도메인 항목을 추출하여 한 줄씩 처리
 while IFS= read -r domain; do
@@ -53,6 +60,16 @@ while IFS= read -r domain; do
   else
     echo "⚠️ 이미 차단된 도메인: $domain"
   fi
+
+    # /etc/dnsmasq.conf에 이미 존재하지 않으면 추가
+  if ! grep -qE "^address=/$domain/0\.0\.0\.0" "$DNSMASQ_CONF"; then
+    append_dnsmasq+="address=/$domain/0.0.0.0"$'\n'
+    echo "⛔ dnsmasq 차단 추가됨: $domain"
+    ((BLOCKED++))
+  else
+    echo "⚠️ dnsmasq에 이미 차단된 도메인: $domain"
+  fi
+
 done < <(jq -r '.[].domain' "$JSON_FILE")
 
 # 차단할 항목이 있으면 hosts 파일에 한 번에 추가
@@ -62,6 +79,19 @@ if [ -n "$append_lines" ]; then
   printf "%s" "$append_lines" >> "$temp_file"  # 차단 도메인 추가
   sudo cp "$temp_file" "$HOSTS_FILE"           # 원본 파일 덮어쓰기
   rm "$temp_file"                    # 임시 파일 삭제
+fi
+
+# dnsmasq.conf에 항목 추가
+if [ -n "$append_dnsmasq" ]; then
+  tmp_dnsmasq=$(mktemp)
+  cat "$DNSMASQ_CONF" > "$tmp_dnsmasq"
+  printf "%s" "$append_dnsmasq" >> "$tmp_dnsmasq"
+  sudo cp "$tmp_dnsmasq" "$DNSMASQ_CONF"
+  rm "$tmp_dnsmasq"
+
+  # dnsmasq 재시작 (변경된 설정 적용하려면 필수)
+  echo "🔁 dnsmasq 재시작 중..."
+  sudo systemctl restart dnsmasq
 fi
 
 # 최종 결과 출력

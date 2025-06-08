@@ -61,18 +61,9 @@ for date in $all_dates; do
   IFS=',' read -r -a added_arr <<< "${added_raw%,}"
   IFS=',' read -r -a deleted_arr <<< "${deleted_raw%,}"
 
-  # 빈 문자열일 경우 빈 배열로 처리
-  if [[ -z "$added_raw" ]]; then
-    added_json=""
-  else
-    added_json=$(printf '"%s",' "${added_arr[@]}" | sed 's/,$//')
-  fi
-
-  if [[ -z "$deleted_raw" ]]; then
-    deleted_json=""
-  else
-    deleted_json=$(printf '"%s",' "${deleted_arr[@]}" | sed 's/,$//')
-  fi
+  # 배열을 JSON 문자열 배열 형태로 변환 ('"도메인",...' 꼴)
+  added_json=$(printf '"%s",' "${added_arr[@]}" | sed 's/,$//')
+  deleted_json=$(printf '"%s",' "${deleted_arr[@]}" | sed 's/,$//')
 
   # 날짜별 JSON 객체를 출력 파일에 추가 (포맷팅 포함)
   printf '  "%s": {\n    "added": [%s],\n    "deleted": [%s]\n  },\n' \
@@ -84,4 +75,5 @@ sed -i '$ s/},/}/' "$OUTPUT_JSON"
 
 # JSON 닫는 중괄호 추가
 echo "}" >> "$OUTPUT_JSON"
+
 
